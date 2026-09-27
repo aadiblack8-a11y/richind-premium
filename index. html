@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RichIND Premium</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:linear-gradient(135deg,#08152f,#25105c,#7b176f);
+    color:#fff;
+    min-height:100vh;
+}
+
+.container{
+    max-width:520px;
+    margin:auto;
+    padding:20px;
+}
+
+.logo{
+    text-align:center;
+    font-size:38px;
+    font-weight:900;
+    margin:10px 0 20px;
+    background:linear-gradient(90deg,#39d8ff,#8c7bff,#ff54c8);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.card{
+    background:rgba(255,255,255,.10);
+    backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:22px;
+    padding:20px;
+    margin:15px 0;
+    box-shadow:0 10px 30px #0004;
+}
+
+h2,h3{margin-top:0}
+
+input,button,select{
+    width:100%;
+    padding:13px;
+    margin:7px 0;
+    border-radius:12px;
+    border:0;
+    font-size:15px;
+}
+
+input,select{
+    background:#fff;
+    color:#111;
+}
+
+button{
+    background:linear-gradient(90deg,#247cff,#9b3cff);
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+}
+
+button:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.secondary{
+    background:#ffffff18;
+    border:1px solid #ffffff30;
+}
+
+.danger{
+    background:#e53935;
+}
+
+.green{
+    background:#159957;
+}
+
+.stat{
+    display:flex;
+    gap:10px;
+}
+
+.stat>div{
+    flex:1;
+    background:#0003;
+    padding:15px 8px;
+    border-radius:15px;
+    text-align:center;
+}
+
+.money{
+    font-size:22px;
+    font-weight:800;
+}
+
+.task{
+    padding:15px;
+    background:#0003;
+    border-radius:15px;
+    margin:10px 0;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:center;
+}
+
+.badge{
+    padding:5px 9px;
+    border-radius:20px;
+    background:#20c997;
+    font-size:12px;
+}
+
+.small{
+    font-size:12px;
+    color:#d9d9e8;
+    line-height:1.5;
+}
+
+.notice{
+    background:#ffcc0020;
+    border:1px solid #ffcc0055;
+    padding:12px;
+    border-radius:12px;
+}
+
+.pending{
+    background:#ff980020;
+    border:1px solid #ff980055;
+    padding:12px;
+    border-radius:12px;
+}
+
+.approved{
+    background:#20c99720;
+    border:1px solid #20c99755;
+    padding:12px;
+    border-radius:12px;
+}
+
+.rejected{
+    background:#f4433620;
+    border:1px solid #f4433655;
+    padding:12px;
+    border-radius:12px;
+}
+
+.hidden{
+    display:none!important;
+}
+
+hr{
+    border:0;
+    border-top:1px solid #ffffff18;
+    margin:18px 0;
+}
+
+.adminTitle{
+    color:#ffd45a;
+}
+
+.status{
+    font-weight:bold;
+    text-transform:uppercase;
+}
+
+.message{
+    padding:10px;
+    border-radius:10px;
+    margin-top:10px;
+    background:#0003;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo">RichIND</div>
+
+<!-- SIGN UP -->
+<div id="auth" class="card">
+
+<h2>🚀 Create Account</h2>
+
+<input id="name" placeholder="Your Name">
+
+<input id="mobile" placeholder="Mobile Number" type="tel">
+
+<button onclick="signup()">Create Account</button>
+
+</div>
+
+
+<!-- PAYMENT -->
+<div id="payment" class="card hidden">
+
+<h2>💎 RichIND Premium</h2>
+
+<h1>₹99</h1>
+
+<p>Premium activate karne ke liye ₹99 payment karein.</p>
+
+<div class="notice">
+
+<b>UPI ID:</b><br>
+
+<span id="upiText"></span>
+
+</div>
+
+<button onclick="payUPI()">
+💳 Pay with UPI / GPay
+</button>
+
+<input
+id="utr"
+placeholder="Payment ke baad UTR / Transaction ID"
+>
+
+<button onclick="submitPayment()">
+Submit Payment
+</button>
+
+<p id="paymentMsg" class="small"></p>
+
+<hr>
+
+<p class="small">
+Payment verify hone ke baad admin activation code dega.
+</p>
+
+<input
+id="activation"
+placeholder="Activation Code"
+>
+
+<button onclick="activate()">
+🔑 Activate Premium
+</button>
+
+</div>
+
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+
+<!-- USER INFO -->
+<div class="card">
+
+<div class="row">
+
+<h2>
+👋 Hi, <span id="userName"></span>
+</h2>
+
+<button
+class="secondary"
+style="width:auto;padding:8px 12px"
+onclick="logout()">
+Logout
+</button>
+
+</div>
+
+<span class="badge">
+PREMIUM ACTIVE
+</span>
+
+<div class="stat" style="margin-top:15px">
+
+<div>
+<div class="money">
+₹<span id="paid">0</span>
+</div>
+<div class="small">
+Premium Paid
+</div>
+</div>
+
+<div>
+<div class="money">
+₹<span id="earned">0</span>
+</div>
+<div class="small">
+Task Earnings
+</div>
+</div>
+
+<div>
+<div class="money" id="completed">0</div>
+<div class="small">
+Completed
+</div>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- TASKS -->
+<div class="card">
+
+<h3>💼 Available Work</h3>
+
+<div id="tasks"></div>
+
+</div>
+
+
+<!-- WITHDRAW -->
+<div class="card">
+
+<h3>💰 Withdraw Earnings</h3>
+
+<p class="small">
+Withdrawal request submit karne ke baad admin approval required hoga.
+</p>
+
+<input
+id="withdrawAmount"
+type="number"
+placeholder="Withdrawal Amount"
+>
+
+<input
+id="withdrawUPI"
+placeholder="Your UPI ID"
+>
+
+<button onclick="requestWithdrawal()">
+💸 Request Withdrawal
+</button>
+
+<p id="withdrawMsg" class="small"></p>
+
+</div>
+
+
+<!-- WITHDRAWAL STATUS -->
+<div class="card">
+
+<h3>📋 Withdrawal Status</h3>
+
+<div id="withdrawals"></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   SETTINGS
+========================= */
+
+const UPI_ID = "yourupi@upi";
+
+/*
+   Admin activation code.
+   Isko apne secret code se change kar sakte ho.
+*/
+const ACTIVATION_CODE = "RICHIND99";
+
+
+/* =========================
+   DATA
+========================= */
+
+let user = JSON.parse(localStorage.getItem("richind_user")) || null;
+
+let tasks = [
+    {
+        id:1,
+        title:"Data Entry Task",
+        description:"Basic data entry complete karein.",
+        reward:20
+    },
+    {
+        id:2,
+        title:"Form Filling Task",
+        description:"Given information ko form mein submit karein.",
+        reward:30
+    },
+    {
+        id:3,
+        title:"Survey Task",
+        description:"Short survey complete karein.",
+        reward:25
+    }
+];
+
+let withdrawals =
+    JSON.parse(localStorage.getItem("richind_withdrawals")) || [];
+
+
+/* =========================
+   START
+========================= */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    document.getElementById("upiText").innerText = UPI_ID;
+
+    if(user){
+        if(user.active){
+            showDashboard();
+        }else{
+            showPayment();
+        }
+    }else{
+        showAuth();
+    }
+
+});
+
+
+/* =========================
+   SIGNUP
+========================= */
+
+function signup(){
+
+    const name =
+        document.getElementById("name").value.trim();
+
+    const mobile =
+        document.getElementById("mobile").value.trim();
+
+    if(name === ""){
+        alert("Please enter your name.");
+        return;
+    }
+
+    if(mobile === ""){
+        alert("Please enter your mobile number.");
+        return;
+    }
+
+    if(mobile.length < 10){
+        alert("Please enter a valid mobile number.");
+        return;
+    }
+
+    user = {
+
+        name:name,
+
+        mobile:mobile,
+
+        paid:0,
+
+        earned:0,
+
+        completed:0,
+
+        active:false,
+
+        paymentSubmitted:false,
+
+        utr:"",
+
+        completedTasks:[]
+
+    };
+
+    localStorage.setItem(
+        "richind_user",
+        JSON.stringify(user)
+    );
+
+    showPayment();
+}
+
+
+/* =========================
+   SHOW AUTH
+========================= */
+
+function showAuth(){
+
+    document.getElementById("auth")
+        .classList.remove("hidden");
+
+    document.getElementById("payment")
+        .classList.add("hidden");
+
+    document.getElementById("dashboard")
+        .classList.add("hidden");
+}
+
+
+/* =========================
+   SHOW PAYMENT
+========================= */
+
+function showPayment(){
+
+    document.getElementById("auth")
+        .classList.add("hidden");
+
+    document.getElementById("payment")
+        .classList.remove("hidden");
+
+    document.getElementById("dashboard")
+        .classList.add("hidden");
+
+    document.getElementById("upiText").innerText = UPI_ID;
+
+    if(user && user.paymentSubmitted){
+
+        document.getElementById("paymentMsg").innerHTML =
+        '<div class="pending">Payment submitted. Admin verification pending.</div>';
+
+    }
+
+}
+
+
+/* =========================
+   UPI PAYMENT
+========================= */
+
+function payUPI(){
+
+    const amount = 99;
+
+    const upiURL =
+        "upi://pay?pa=" +
+        encodeURIComponent(UPI_ID) +
+        "&pn=RichIND" +
+        "&am=" +
+        amount +
+        "&cu=INR";
+
+    window.location.href = upiURL;
+
+}
+
+
+/* =========================
+   PAYMENT SUBMIT
+========================= */
+
+function submitPayment(){
+
+    const utr =
+        document.getElementById("utr").value.trim();
+
+    if(utr === ""){
+
+        alert("Please enter UTR / Transaction ID.");
+
+        return;
+    }
+
+    if(!user){
+
+        alert("Please create your account first.");
+
+        return;
+    }
+
+    user.utr = utr;
+
+    user.paymentSubmitted = true;
+
+    localStorage.setItem(
+        "richind_user",
+        JSON.stringify(user)
+    );
+
+    document.getElementById("paymentMsg").innerHTML =
+    '<div class="pending">Payment submitted successfully. Admin verification pending.</div>';
+
+}
+
+
+/* =========================
+   ACTIVATE
+========================= */
+
+function activate(){
+
+    const code =
+        document.getElementById("activation").value.trim();
+
+    if(code === ""){
+
+        alert("Please enter activation code.");
+
+        return;
+    }
+
+    if(code !== ACTIVATION_CODE){
+
+        alert("Invalid activation code.");
+
+        return;
+    }
+
+    user.active = true;
+
+    user.paid = 99;
+
+    localStorage.setItem(
+        "richind_user",
+        JSON.stringify(user)
+    );
+
+    showDashboard();
+
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function showDashboard(){
+
+    document.getElementById("auth")
+        .classList.add("hidden");
+
+    document.getElementById("payment")
+        .classList.add("hidden");
+
+    document.getElementById("dashboard")
+        .classList.remove("hidden");
+
+    updateDashboard();
+
+    renderTasks();
+
+    renderWithdrawals();
+
+}
+
+
+/* =========================
+   DASHBOARD UPDATE
+========================= */
+
+function updateDashboard(){
+
+    document.getElementById("userName")
+        .innerText = user.name;
+
+    document.getElementById("paid")
+        .innerText = user.paid || 0;
+
+    document.getElementById("earned")
+        .innerText = user.earned || 0;
+
+    document.getElementById("completed")
+        .innerText = user.completed || 0;
+
+}
+
+
+/* =========================
+   TASKS
+========================= */
+
+function renderTasks(){
+
+    const container =
+        document.getElementById("tasks");
+
+    container.innerHTML = "";
+
+    tasks.forEach(function(task){
+
+        const completed =
+            user.completedTasks &&
+            user.completedTasks.includes(task.id);
+
+        const div =
+            document.createElement("div");
+
+        div.className = "task";
+
+        div.innerHTML = `
+
+            <div class="row">
+
+                <div>
+
+                    <h3>${task.title}</h3>
+
+                    <div class="small">
+                        ${task.description}
+                    </div>
+
+                </div>
+
+                <strong>
+                    ₹${task.reward}
+                </strong>
+
+            </div>
+
+            ${
+                completed
+
+                ?
+
+                `<button disabled>
+                    ✅ Completed
+                </button>`
+
+                :
+
+                `<button onclick="completeTask(${task.id})">
+                    Complete Task
+                </button>`
+            }
+
+        `;
+
+        container.appendChild(div);
+
+    });
+
+}
+
+
+/* =========================
+   COMPLETE TASK
+========================= */
+
+function completeTask(taskId){
+
+    const task =
+        tasks.find(function(t){
+            return t.id === taskId;
+        });
+
+    if(!task){
+        return;
+    }
+
+    if(!user.completedTasks){
+        user.completedTasks = [];
+    }
+
+    if(user.completedTasks.includes(taskId)){
+
+        alert("Task already completed.");
+
+        return;
+    }
+
+    user.completedTasks.push(taskId);
+
+    user.completed =
+        user.completed + 1;
+
+    user.earned =
+        user.earned + task.reward;
+
+    localStorage.setItem(
+        "richind_user",
+        JSON.stringify(user)
+    );
+
+    updateDashboard();
+
+    renderTasks();
+
+    alert(
+        "Task completed! ₹" +
+        task.reward +
+        " added."
+    );
+
+}
+
+
+/* =========================
+   WITHDRAWAL REQUEST
+========================= */
+
+function requestWithdrawal(){
+
+    const amount =
+        Number(
+            document.getElementById("withdrawAmount").value
+        );
+
+    const upi =
+        document.getElementById("withdrawUPI")
+        .value.trim();
+
+    const msg =
+        document.getElementById("withdrawMsg");
+
+    if(!amount || amount <= 0){
+
+        msg.innerText =
+        "Please enter a valid withdrawal amount.";
+
+        return;
+    }
+
+    if(amount > user.earned){
+
+        msg.innerText =
+        "Insufficient balance.";
+
+        return;
+    }
+
+    if(!upi){
+
+        msg.innerText =
+        "Please enter your UPI ID.";
+
+        return;
+    }
+
+    const request = {
+
+        id:Date.now(),
+
+        amount:amount,
+
+        upi:upi,
+
+        status:"pending",
+
+        date:new Date().toLocaleString()
+
+    };
+
+    withdrawals.push(request);
+
+    localStorage.setItem(
+        "richind_withdrawals",
+        JSON.stringify(withdrawals)
+    );
+
+    /*
+       Amount pending request mein chala jayega.
+    */
+
+    user.earned =
+        user.earned - amount;
+
+    localStorage.setItem(
+        "richind_user",
+        JSON.stringify(user)
+    );
+
+    updateDashboard();
+
+    renderWithdrawals();
+
+    document.getElementById("withdrawAmount")
+        .value = "";
+
+    document.getElementById("withdrawUPI")
+        .value = "";
+
+    msg.innerHTML =
+    '<div class="pending">Withdrawal request submitted. Admin approval required.</div>';
+
+}
+
+
+/* =========================
+   WITHDRAWAL LIST
+========================= */
+
+function renderWithdrawals(){
+
+    const container =
+        document.getElementById("withdrawals");
+
+    if(!container){
+        return;
+    }
+
+    container.innerHTML = "";
+
+    const list =
+        withdrawals.slice().reverse();
+
+    if(list.length === 0){
+
+        container.innerHTML =
+        '<p class="small">No withdrawal requests yet.</p>';
+
+        return;
+    }
+
+    list.forEach(function(item){
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            item.status === "approved"
+            ? "approved"
+            : item.status === "rejected"
+            ? "rejected"
+            : "pending";
+
+        div.style.marginBottom = "10px";
+
+        div.innerHTML = `
+
+            <b>₹${item.amount}</b>
+
+            <br>
+
+            UPI: ${item.upi}
+
+            <br>
+
+            Status:
+            <span class="status">
+                ${item.status}
+            </span>
+
+            <br>
+
+            <span class="small">
+                ${item.date}
+            </span>
+
+        `;
+
+        container.appendChild(div);
+
+    });
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout(){
+
+    user = null;
+
+    localStorage.removeItem("richind_user");
+
+    showAuth();
+
+}
+
+
+/* =========================
+   DEBUG
+========================= */
+
+window.signup = signup;
+window.payUPI = payUPI;
+window.submitPayment = submitPayment;
+window.activate = activate;
+window.logout = logout;
+window.completeTask = completeTask;
+window.requestWithdrawal = requestWithdrawal;
+
+</script>
+
+</body>
+</html>
